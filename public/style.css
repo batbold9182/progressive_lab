@@ -1,0 +1,59 @@
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  background-color: #f7f7f7;
+  margin: 0;
+  padding: 0;
+}
+
+header {
+  background-color: #1e88e5;
+  color: white;
+  padding: 1em 0;
+}
+
+.logo {
+  height: 150px;
+  animation: spin 5s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+main {
+  margin: 2em auto;
+  width: 90%;
+  max-width: 600px;
+}
+
+.camera video {
+  width: 100%;
+  border-radius: 10px;
+  background-color: #000;
+}
+
+.camera-controls {
+  margin-top: 10px;
+}
+
+.button-primary, .button-btn {
+  background-color: #1e88e5;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  margin: 5px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.button-primary:hover, .button-btn:hover {
+  background-color: #1565c0;
+}
+
+.counter {
+  margin-top: 20px;
+  font-size: 1.2em;
+}
