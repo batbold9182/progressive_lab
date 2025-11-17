@@ -22,7 +22,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // ===== MongoDB Connection =====
 mongoose.connect("mongodb://127.0.0.1:27017/progressive_lab");
-const db = mongoose.connection;
+const db = mongoose.connection; 
 db.on("error", console.error.bind(console, "❌ MongoDB connection error:"));
 db.once("open", () => console.log("✅ Connected to MongoDB!"));
 
@@ -76,6 +76,24 @@ app.get("/photos", async (req, res) => {
     res.json(photos);
   } catch (err) {
     console.error("❌ Error loading photos:", err);
+    res.status(500).json({ success: false });
+  }
+});
+// server/server.js
+app.delete('/delete/:filename', async (req, res) => {
+  const { filename } = req.params;
+  const filepath = path.join(__dirname, 'uploads', filename);
+
+  try {
+    // Remove file
+    if (fs.existsSync(filepath)) fs.unlinkSync(filepath);
+
+    // Remove from DB
+    await Photo.deleteOne({ imageUrl: `http://localhost:3000/uploads/${filename}` });
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Delete error:', err);
     res.status(500).json({ success: false });
   }
 });

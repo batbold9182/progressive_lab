@@ -1,81 +1,94 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Progressive_lab</title>
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Progressive_lab</title>
 
-  <!-- Leaflet CSS -->
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-  />
+    <!-- Leaflet CSS -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
 
-  <!-- Your custom CSS -->
-  <link rel="manifest" href="manifest.json">
-  <link rel="icon" href="/pictures/logo-192x192.png" type="image/png">
-  <link rel="apple-touch-icon" href="/pictures/logo-192x192.png">
-  <meta name="theme-color" content="#0a84ff">
+    />
+
+    <!-- Your custom CSS -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="/pictures/logo-192x192.png" type="image/png">
+    <link rel="apple-touch-icon" href="/pictures/logo-192x192.png">
+    <link rel="stylesheet" href="style.css" />
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+    <meta name="theme-color" content="#0a84ff">
 
 
-</head>
-<body>
-  <header>
-    <div class="container">
-      <img src="/pictures/logo.png" alt="Progressive_lab Logo" class="logo" />
-    </div>
-    <h1>Progressive_lab</h1>
-  </header>
-
-  <main>
-    <!-- Map Section -->
-    <section class="map-section">
-      <h2>Map</h2>
-      <div id="map" style="height: 300px; width: 100%; border-radius: 10px;"></div>
-    </section>
-
-    <!-- Camera Section -->
-    <section class="camera">
-      <h2>Camera</h2>
-      <video id="video">Video stream not available.</video>
-      <div class="camera-controls">
-        <button id="camera-permissions-button" class="button-primary">Allow Camera</button>
-        <button id="start-button" class="button-primary">Capture Photo</button>
-        <button id="delete-button" class="button-primary">Delete Photo</button>
-      </div>
-      <canvas id="canvas"></canvas>
-      <div class="output">
-        <img id="photo" alt="Captured image will appear here" />
-      </div>
-    </section>
-
-    <!-- Location Section -->
-    <section class="location">
-      <h2>Location</h2>
-      <p id="status">Location not available.</p>
-      <a id="map-link" target="_blank" rel="noopener noreferrer"></a>
-      <div class="location-controls">
-        <button id="find-me" class="button-primary">Find My Location</button>
-        <button id="hide-button" class="button-primary">Hide Location</button>
-      </div>
-    </section>
-
-    <!-- Counter -->
-    <div class="counter">
-      <p>Count: <span id="count">0</span></p>
-      <button id="inc" class="button-btn">+</button>
-      <button id="dec" class="button-btn">-</button>
+  </head>
+  <body>
+    <div id="offline-banner">
+      You are currently offline. Some features may not be available.
     </div>
 
-    <!-- Test Button -->
-    <div class="test123">
-      <button id="test" class="button-btn">Testing method</button>
-    </div>
-  </main>
+    <header>
+      <div class="container">
+        <img src="./pictures/logo.png" alt="Progressive_lab Logo" class="logo" />
+      </div>
+      <h1>Progressive_lab</h1>
+    </header>
 
-  <!-- Leaflet JS (must load before app.js) -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <!-- Your app JS -->
-  <script src="app.js"></script>
-</body>
-</html>
+    <main>
+        <h2>Map</h2>
+        <div id="map" style="height: 300px; width: 100%; border-radius: 10px;"></div>
+      </section>
+      <!-- Gallery Section -->
+          <section class="gallery">
+            <button id="load-gallery-button" class="button-primary">Load Photo Gallery</button>
+            <button id="hide-gallery-button" class="button-primary">Hide Gallery</button>
+            <h2>Photo Gallery</h2>
+            <div id="gallery-grid"></div>
+          </section>
+
+      <!-- Camera Section -->
+      <section class="camera">
+        <h2>Camera</h2>
+        <video id="video">Video stream not available.</video>
+        <div class="camera-controls">
+          <button id="camera-permissions-button" class="button-primary">Allow Camera</button>
+          <button id="start-button" class="button-primary">Capture Photo</button>
+          <button id="delete-button" class="button-primary">Delete Photo</button>
+        </div>
+        <canvas id="canvas"></canvas>
+        <div class="output">
+          <img id="photo" alt="Captured image will appear here" />
+        </div>
+      </section>
+
+      <!-- Location Section -->
+      <section class="location">
+        <h2>Location</h2>
+        <p id="status">Location not available.</p>
+        <a id="map-link" target="_blank" rel="noopener noreferrer"></a>
+        <div class="location-controls">
+          <button id="find-me" class="button-primary">Find My Location</button>
+          <button id="hide-button" class="button-primary">Hide Location</button>
+        </div>
+      </section>
+
+      <!-- Counter -->
+      <div class="counter">
+        <p>Count: <span id="count">0</span></p>
+        <button id="inc" class="button-btn">+</button>
+        <button id="dec" class="button-btn">-</button>
+      </div>
+
+      <!-- Test Button -->
+      <div class="test123">
+        <button id="test" class="button-btn">Testing method</button>
+      </div>
+    </main>
+
+    <!-- Leaflet JS (must load before app.js) -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Your app JS -->
+    <script type="module" src="main.js"></script>
+  </body>
+  </html>
