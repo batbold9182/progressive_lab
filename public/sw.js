@@ -1,4 +1,4 @@
-const CACHE_NAME = 'progressive_lab_v4.1';
+const CACHE_NAME = 'progressive_lab_v4.37';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -27,8 +27,7 @@ self.addEventListener('install', event => {
   // Activate worker immediately
   self.skipWaiting();
 
-  // Try to cache the listed resources. If some resources fail (404, etc.),
-  // don't fail the whole install — instead cache what we can.
+  // Try to cache the listed resources. If some resources fail,don't fail the whole install — instead cache what we can.
   event.waitUntil(
     caches.open(CACHE_NAME).then(async cache => {
       try {

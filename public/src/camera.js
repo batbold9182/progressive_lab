@@ -53,13 +53,21 @@ function setupCamera() {
 
   video.addEventListener('canplay', () => {
     if (!streaming) {
+    if (video.videoWidth > 0 && video.videoHeight > 0) {
       height = video.videoHeight / (video.videoWidth / width);
-      video.setAttribute('width', width);
-      video.setAttribute('height', height);
-      canvas.setAttribute('width', width);
-      canvas.setAttribute('height', height);
-      streaming = true;
+    } else {
+      // Fallback if metadata is not ready
+      height = width * 0.75; // 4:3 alternative
+      // height = width * 9 / 16; // If you prefer 16:9
     }
+
+    video.setAttribute('width', width);
+    video.setAttribute('height', height);
+    canvas.setAttribute('width', width);
+    canvas.setAttribute('height', height);
+
+    streaming = true;
+  }
   });
 
   clearPhoto();

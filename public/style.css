@@ -1,23 +1,45 @@
+:root{
+  /* Colors */
+  --primary-color: #1e88e5;
+  --primary-color-hover: #1565c0;
+  --primary-color-disabled: #90caf9;
+  --offline-banner-color: #ff5252;
+  --text-color: #ffffff;
+  --background-color: #f7f7f7;
+
+  /* Sizes */
+  --logo-height: 150px;
+  --logo-height-mobile: 80px;
+  --logo-height-tablet: 110px;
+  --border-radius: 10px;
+  --button-padding: 10px 16px;
+  --button-margin: 5px;
+  --transition-speed: 0.2s;
+}
+html,body{
+  max-width: 100%;
+  overflow-x: hidden;
+}
 body {
   font-family: Arial, sans-serif;
   text-align: center;
-  background-color: #f7f7f7;
+  background-color: var(--background-color);
   margin: 0;
   padding: 0;
 }
 
 header {
-  background-color: #1e88e5;
-  color: white;
+  background-color: var(--primary-color);
+  color: var(--text-color);
   padding: 1em 0;
 }
 
 .logo {
-  height: 150px;
+  height: var(--logo-height);
   display: block;
   margin: 0 auto;
   transform-origin: center center;
-  will-change: transform;
+  /*deleted will change */
   animation: spin 5s linear infinite;
 }
 
@@ -32,31 +54,74 @@ main {
   margin: 2em auto;
   width: 90%;
   max-width: 600px;
+  overflow: hidden;
+}
+section {
+  padding: 10px;
+  overflow-y: auto; 
 }
 
 .camera video {
   width: 100%;
   border-radius: 10px;
   background-color: #000;
+  /* fixed CLS*/
+  aspect-ratio: 16/9;
 }
 
 .camera-controls {
   margin-top: 10px;
 }
-
-.button-primary, .button-btn {
-  background-color: #1e88e5;
-  color: white;
+#canvas{
+  display: none;
+  aspect-ratio: 16/9;
+}
+#photo {
+  width: 100%;
+  aspect-ratio: 16/9;
+  background: #aaa;
+  border-radius: 10px;
+  object-fit: contain;
+}
+/* Refactored buttons using BEM style */
+.button {
   border: none;
-  border-radius: 8px;
-  padding: 10px 16px;
-  margin: 5px;
+  border-radius: var(--border-radius);
+  padding: var(--button-padding);
+  margin: var(--button-margin);
   cursor: pointer;
-  transition: 0.2s;
+  color: var(--text-color);
+  transition: background-color var(--transition-speed);
 }
 
-.button-primary:hover, .button-btn:hover {
-  background-color: #1565c0;
+/* Modifier: primary button */
+.button--primary {
+  background-color: var(--primary-color);
+}
+
+.button--primary:hover {
+  background-color: var(--primary-color-hover);
+}
+
+.button--primary:disabled {
+  background-color: var(--primary-color-disabled);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Modifier: secondary button */
+.button--secondary {
+  background-color: var(--primary-color);
+}
+
+.button--secondary:hover {
+  background-color: var(--primary-color-hover);
+}
+
+.button--secondary:disabled {
+  background-color: var(--primary-color-disabled);
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 
 .counter {
@@ -65,8 +130,8 @@ main {
 }
 #offline-banner {
   display: block;                
-  background-color: #ff5252;   
-  color: white;
+  background-color: var(--offline-banner-color);
+  color: var(--text-color);
   text-align: center;
   padding: 10px;
   font-weight: bold;
@@ -74,11 +139,12 @@ main {
   top: 0;
   left: 0;
   right: 0;
-  width: 100%;
+  /*removed width:100%*/
   z-index: 1000;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-  font-family: Arial, sans-serif;
-  transition: opacity 0.3s ease;
+  /*deleted font-family
+    added background color for transition*/
+  transition: background-color 0.3s;
   opacity: 0;
   visibility: hidden;
 }
@@ -91,20 +157,23 @@ main {
 
 .gallery {
   margin-top: 2em;
+  overflow: hidden;
 }
 
 #gallery-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 10px;
+  gap: var(--button-margin);
+  overflow: hidden;
 }
 
 #gallery-grid img {
   width: 100%;
-  border-radius: 10px;
+  border-radius: var(--border-radius);
   object-fit: cover;
   cursor: pointer;
-  transition: transform 0.2s ease;
+  /*added background color for transition*/
+  transition: background-color var(--transition-speed) ease;
 }
 
 #gallery-grid img:hover {
@@ -126,8 +195,61 @@ main {
 .gallery-overlay img {
   max-width: 90%;
   max-height: 90%;
-  border-radius: 10px;
+  border-radius: var(--border-radius);
   object-fit: contain;
   box-shadow: 0 4px 15px rgba(0,0,0,0.5);
   cursor: default;
+}
+#map {
+    height: 300px;
+    width: 100%;
+    border-radius: var(--border-radius);
+}
+img,video{
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+/* 600px for smaller phones */
+@media (max-width: 600px) {
+   /* Logo smaller on mobile */
+    .logo {
+        height: var(--logo-height-mobile); /* instead of 150px */
+    }
+
+    /* Map height smaller on mobile */
+    #map {
+        height: 200px;
+    }
+
+    /* Gallery grid becomes 2 columns */
+    .gallery {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 10px;
+    }
+
+    /* Section padding reduced for mobile */
+    section {
+        padding: 10px;
+    }
+
+    /* Headings smaller so they fit better */
+    h1, h2 {
+        font-size: 1.4rem;
+        text-align: center;
+    }
+}
+/* 900px for tablets and small laptops */
+@media (max-width: 900px) {
+    .logo {
+        height: var(--logo-height-tablet);
+    }
+
+    .gallery {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    }
+
+    #map {
+        height: 250px;
+    }
 }
