@@ -1,4 +1,4 @@
-const CACHE_NAME = 'progressive_lab_v4.37';
+const CACHE_NAME = 'progressive_lab_v4.6';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -19,7 +19,8 @@ const urlsToCache = [
   '/pictures/logo-512x512-maskable.png',
   '/pictures/logo.png',
   '/pictures/screenshot-desktop.jpg',
-  '/pictures/screenshot-mobile.jpg'
+  '/pictures/screenshot-mobile.jpg',
+  '/src/helper.js'
 ];
 
 // Install - caching essential files

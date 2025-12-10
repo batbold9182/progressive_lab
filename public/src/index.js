@@ -4,6 +4,7 @@ import { fetchPhotos, uploadPhoto, deletePhoto } from './api.js';
 import { addPhotoToGallery, clearGallery, removePhotoByFilename } from './gallery.js';
 import { initMap, addPhotoMarker, clearMarkers, removeMarkerByFilename, setView } from './map.js';
 import { registerServiceWorker, updateOnlineStatus } from './offline.js';
+import { showStatusMessage } from './helper.js';
 
 async function takePictureAndUpload() {
   const dataUrl = takePicture();
@@ -17,11 +18,13 @@ async function takePictureAndUpload() {
       addPhotoMarker(result.entry);
       setView(coords.latitude, coords.longitude, 16);
     } else {
-      alert('Upload failed.');
+      //alert('Upload failed.');
+      showStatusMessage('Photo upload failed.', 'error');
     }
   } catch (err) {
     console.error('Upload error:', err);
-    alert('Failed to upload photo.');
+    //alert('Failed to upload photo.');
+    showStatusMessage('Failed to upload photo.', 'error');
   }
 }
 
@@ -34,9 +37,11 @@ async function loadSavedPhotos() {
       addPhotoMarker(photo);
       addPhotoToGallery(photo);
     });
-    console.log(`✅ Loaded ${photos.length} photos from the database`);
+    //console.log(`✅ Loaded ${photos.length} photos from the database`);
+    showStatusMessage(`Loaded ${photos.length} photos from the database.`, 'success');
   } catch (err) {
-    console.error('Failed to load saved photos:', err);
+    //console.error('Failed to load saved photos:', err);
+    showStatusMessage('Failed to load saved photos.', 'error');
   }
 }
 
@@ -78,10 +83,12 @@ function wireUI() {
             removeMarkerByFilename(filename);
             clearPhoto();
           } else {
-            alert('Failed to delete photo.');
+            //alert('Failed to delete photo.');
+            showStatusMessage('Failed to delete photo.', 'error');
           }
         } catch (err) {
-          console.error('Delete error:', err);
+          //console.error('Delete error:', err);
+          showStatusMessage('Error occurred while deleting photo.', 'error');
         }
       });
     }

@@ -1,3 +1,4 @@
+import { showStatusMessage } from "./helper.js";
 const offlineBanner = document.getElementById('offline-banner');
 
 function showOfflineBanner() {
@@ -12,6 +13,7 @@ async function updateOnlineStatus() {
   if (!navigator.onLine) {
     showOfflineBanner();
     console.log('Offline (navigator.onLine) - banner shown');
+    showStatusMessage('You are offline.', 'error');
     return;
   }
 
@@ -20,12 +22,15 @@ async function updateOnlineStatus() {
     if (response.ok) {
       hideOfflineBanner();
       console.log('Online - banner hidden');
+      showStatusMessage('You are back online.', 'success');
     } else {
       showOfflineBanner();
+      showStatusMessage('You are offline.', 'error');
     }
   } catch (err) {
     showOfflineBanner();
     console.log('Offline (fetch failed) - banner shown:', err.message);
+    showStatusMessage('You are offline (fetch faled).', 'error');
   }
 }
 

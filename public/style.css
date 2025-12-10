@@ -16,6 +16,48 @@
   --button-margin: 5px;
   --transition-speed: 0.2s;
 }
+.status-message {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+
+  padding: 12px 16px;
+  text-align: center;
+  font-weight: bold;
+
+  z-index: 2000;
+
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease;
+
+  color: var(--text-color); /* white text for all message types */
+}
+
+/* INFO – uses your primary color */
+.status-message.info {
+  background-color: var(--primary-color);
+  border-bottom: 3px solid var(--primary-color-hover);
+}
+
+/* SUCCESS – green-style but matching your theme intensity */
+.status-message.success {
+  background-color: #2e7d32;  /* material green 700 */
+  border-bottom: 3px solid #1b5e20;
+}
+
+/* ERROR – matches offline-banner color */
+.status-message.error {
+  background-color: var(--offline-banner-color);
+  border-bottom: 3px solid #d32f2f;
+}
+
+/* When visible */
+.status-message.show {
+  opacity: 1;
+  visibility: visible;
+}
 html,body{
   max-width: 100%;
   overflow-x: hidden;

@@ -1,3 +1,4 @@
+import {showStatusMessage} from "./helper.js";
 const width = 320;
 let height = 0;
 let streaming = false;
@@ -47,7 +48,8 @@ function setupCamera() {
       })
       .catch((err) => {
         console.error('Camera error:', err);
-        alert('Unable to access camera. Check permissions.');
+        //alert('Unable to access camera. Check permissions.');
+        showStatusMessage('Unable to access camera. Check permissions.', 'error');
       });
   });
 
