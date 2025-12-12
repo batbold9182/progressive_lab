@@ -10,13 +10,30 @@ function initMap() {
 
 function addPhotoMarker(entry) {
   if (entry.lat == null || entry.lon == null) return;
-  const popupContent = `
+  /*const popupContent = `
     <div style="text-align:center;">
       <p><strong>${new Date(entry.timestamp).toLocaleString()}</strong></p>
       <img src="${entry.imageUrl}" style="width:150px;border-radius:10px;" />
       <p>Lat: ${entry.lat}, Lon: ${entry.lon}</p>
     </div>
-  `;
+  `;*/
+  const container = document.createElement('div');
+  container.style.textAlign = 'center';
+  // time stamp ===========================================
+  const time = document.createElement('p');
+  time.innerHTML = `<strong>${new Date(entry.timestamp).toLocaleString()}</strong>`;
+  container.appendChild(time);
+  // image ================================================
+  const img = document.createElement('img');
+  img.src = entry.imageUrl;
+  img.style.width = '150px';
+  img.style.borderRadius = '10px';
+  container.appendChild(img);
+  // coordinates ========================================
+  const coords = document.createElement('p');
+  coords.textContent = `Lat: ${entry.lat}, Lon: ${entry.lon}`;
+  container.appendChild(coords);
+  //popup content ========================================
   const marker = L.marker([entry.lat, entry.lon]).addTo(map).bindPopup(popupContent);
   markers.push(marker);
 }
