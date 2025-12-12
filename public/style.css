@@ -16,6 +16,34 @@
   --button-margin: 5px;
   --transition-speed: 0.2s;
 }
+#loading-overlay {
+  display: none;               /* hidden by default */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5); /* semi-transparent black */
+  color: #fff;
+  font-size: 1.5em;
+  font-weight: bold;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  text-align: center;
+}
+
+/* Optional: add a spinning animation */
+#loading-overlay::after {
+  content: '';
+  margin-left: 10px;
+  width: 20px;
+  height: 20px;
+  border: 3px solid #fff;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
 .status-message {
   position: fixed;
   top: 0;

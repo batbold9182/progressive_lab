@@ -2,143 +2,207 @@ import { setupCamera, takePicture, clearPhoto, startButton } from './camera.js';
 import { getUserLocation, geoFindMe } from './location.js';
 import { fetchPhotos, uploadPhoto, deletePhoto } from './api.js';
 import { addPhotoToGallery, clearGallery, removePhotoByFilename } from './gallery.js';
-import { initMap, addPhotoMarker, clearMarkers, removeMarkerByFilename, setView } from './map.js';
+import { initMap, addPhotoMarker, clearMarkers, removeMarkerByFilename } from './map.js';
 import { registerServiceWorker, updateOnlineStatus } from './offline.js';
-import { showStatusMessage } from './helper.js';
+import { showStatusMessage, showLoading, hideLoading } from './helper.js';
 
+// -----------------------
+// Utility: promise timeout
+// -----------------------
+async function withTimeout(promise, ms, errorMessage = "Operation timed out") {
+  let timeoutId;
+  const timeout = new Promise((_, reject) => {
+    timeoutId = setTimeout(() => reject(new Error(errorMessage)), ms);
+  });
+
+  try {
+    const result = await Promise.race([promise, timeout]);
+    clearTimeout(timeoutId);
+    return result;
+  } catch (err) {
+    clearTimeout(timeoutId);
+    throw err;
+  }
+}
+
+// -----------------------
+// Safe API calls
+// -----------------------
+async function getUserLocationSafe() {
+  return withTimeout(getUserLocation(), 10000, "Location request timed out");
+}
+
+async function fetchPhotosSafe() {
+  return withTimeout(fetchPhotos(), 10000, "Fetching photos timed out");
+}
+
+async function deletePhotoSafe(filename) {
+  return withTimeout(deletePhoto(filename), 10000, "Delete photo timed out");
+}
+
+// -----------------------
+// Photo upload
+// -----------------------
 async function takePictureAndUpload() {
   const dataUrl = takePicture();
 
-  // Validate image
   if (!isValidDataUrl(dataUrl)) {
     showStatusMessage("Invalid image data.", "error");
     return;
   }
 
-  // Validate size (prevent huge Base64 uploads)
-  if (!isReasonableImageSize(dataUrl, 5 * 1024 * 1024)) { // 5 MB limit
+  if (!isReasonableImageSize(dataUrl, 5 * 1024 * 1024)) {
     showStatusMessage("Image is too large to upload.", "error");
     return;
   }
 
-  let coords;
-  try {
-    coords = await getUserLocation();
-  } catch (err) {
-    showStatusMessage("Unable to get location.", "error");
-    return;
-  }
-
-  // Validate coordinates
-  if (!isValidCoordinates(coords)) {
-    showStatusMessage("Invalid location data.", "error");
-    return;
-  }
+  showLoading("Uploading photo...");
 
   try {
-    const result = await uploadPhoto(
-      dataUrl,
-      coords.latitude,
-      coords.longitude
-    );
+    const coords = await getUserLocationSafe();
+    if (!isValidCoordinates(coords)) {
+      showStatusMessage("Invalid location data.", "error");
+      return;
+    }
 
+    const result = await uploadPhoto(dataUrl, coords.latitude, coords.longitude);
     showStatusMessage("Photo uploaded!", "success");
     return result;
 
-  } catch (error) {
-    showStatusMessage("Upload failed.", "error");
+  } catch (err) {
+    console.error("Upload error:", err);
+    showStatusMessage(err.message || "Upload failed.", "error");
+
+  } finally {
+    hideLoading();
   }
 }
+
+// -----------------------
+// Photo validation
+// -----------------------
 function isValidDataUrl(dataUrl) {
   return typeof dataUrl === "string" &&
     dataUrl.startsWith("data:image/") &&
     dataUrl.includes(";base64,");
 }
+
 function isReasonableImageSize(dataUrl, maxBytes) {
   if (!dataUrl) return false;
-
-  // Approximate Base64 → binary size
   const base64String = dataUrl.split(",")[1];
   const byteLength = (base64String.length * 3) / 4;
-
   return byteLength <= maxBytes;
 }
+
 function isValidCoordinates(coords) {
   if (!coords) return false;
-
   const { latitude, longitude } = coords;
-
-  const validLat = typeof latitude === "number" && latitude >= -90 && latitude <= 90;
-  const validLon = typeof longitude === "number" && longitude >= -180 && longitude <= 180;
-
-  return validLat && validLon;
-
+  return typeof latitude === "number" && latitude >= -90 && latitude <= 90 &&
+         typeof longitude === "number" && longitude >= -180 && longitude <= 180;
 }
+
+// -----------------------
+// Load saved photos
+// -----------------------
 async function loadSavedPhotos() {
+  showLoading("Loading photos...");
   try {
-    const photos = await fetchPhotos();
+    const photos = await fetchPhotosSafe();
     clearMarkers();
     clearGallery();
     photos.forEach(photo => {
       addPhotoMarker(photo);
       addPhotoToGallery(photo);
     });
-    //console.log(`✅ Loaded ${photos.length} photos from the database`);
     showStatusMessage(`Loaded ${photos.length} photos from the database.`, 'success');
+
   } catch (err) {
-    //console.error('Failed to load saved photos:', err);
-    showStatusMessage('Failed to load saved photos.', 'error');
+    console.error("Load photos error:", err);
+    showStatusMessage(err.message || "Failed to load photos.", "error");
+
+  } finally {
+    hideLoading();
   }
 }
 
+// -----------------------
+// Wire UI
+// -----------------------
 function wireUI() {
+  const findBtn = document.getElementById('find-me');
+  const hideBtn = document.getElementById('hide-button');
+  const statusEl = document.getElementById('status');
+  const mapLinkEl = document.getElementById('map-link');
+  const deleteBtn = document.getElementById('delete-button');
+  const photoEl = document.getElementById('photo');
+
   setupCamera();
-  if (startButton) startButton.addEventListener('click', async (ev) => {
-    ev.preventDefault();
-    await takePictureAndUpload();
-  });
+  if (startButton) {
+    startButton.addEventListener('click', async (ev) => {
+      ev.preventDefault();
+      await takePictureAndUpload();
+    });
+  }
 
-  const findBtn = document.querySelector('#find-me');
-  const hideBtn = document.querySelector('#hide-button');
   if (findBtn) findBtn.addEventListener('click', geoFindMe);
-  if (hideBtn) hideBtn.addEventListener('click', () => {
-    document.querySelector('#status').textContent = 'Location hidden.';
-    document.querySelector('#map-link').textContent = '';
-  });
+  if (hideBtn) {
+    hideBtn.addEventListener('click', () => {
+      statusEl.textContent = 'Location hidden.';
+      mapLinkEl.textContent = '';
+    });
+  }
 
-  const testButton = document.getElementById('test');
-  if (testButton) testButton.addEventListener('click', () => alert('Testing method button clicked!'));
-
-    const deleteBtn = document.getElementById('delete-button');
-    const photoEl = document.getElementById('photo');
-    if (deleteBtn) {
-      deleteBtn.addEventListener('click', async (ev) => {
-        ev.preventDefault();
-        const currentSrc = photoEl.src;
-        if (!currentSrc || currentSrc.includes('data:image/')) {
-          clearPhoto();
-          return;
-        }
-        try {
-          const filename = currentSrc.split('/').pop();
-          const ok = await deletePhoto(filename);
-          if (ok) {
-
-            removePhotoByFilename(filename);
-
-            removeMarkerByFilename(filename);
-            clearPhoto();
-          } else {
-            //alert('Failed to delete photo.');
-            showStatusMessage('Failed to delete photo.', 'error');
-          }
-        } catch (err) {
-          //console.error('Delete error:', err);
-          showStatusMessage('Error occurred while deleting photo.', 'error');
-        }
-      });
+  function getFilenameFromUrl(url) {
+    try {
+      const parsedUrl = new URL(url);
+      return parsedUrl.pathname.split('/').pop().split('?')[0];
+    } catch {
+      return null;
     }
+  }
+
+  if (deleteBtn) {
+    deleteBtn.addEventListener('click', async (ev) => {
+      ev.preventDefault();
+      const currentSrc = photoEl.src;
+
+      if (!currentSrc || currentSrc.startsWith('data:image/')) {
+        clearPhoto();
+        return;
+      }
+
+      if (!confirm("Are you sure you want to delete this photo?")) return;
+
+      const filename = getFilenameFromUrl(currentSrc);
+      if (!filename) {
+        showStatusMessage("Unable to determine filename for deletion.", "error");
+        return;
+      }
+
+      showLoading("Deleting photo...");
+      try {
+        const ok = await deletePhotoSafe(filename);
+        if (ok) {
+          removePhotoByFilename(filename);
+          removeMarkerByFilename(filename);
+          clearPhoto();
+          showStatusMessage("Photo deleted.", "success");
+        } else {
+          showStatusMessage("Failed to delete photo.", "error");
+        }
+      } catch (err) {
+        console.error("Delete error:", err);
+        showStatusMessage(err.message || "Delete failed.", "error");
+      } finally {
+        hideLoading();
+      }
+    });
+  }
 }
+
+// -----------------------
+// Gallery buttons
+// -----------------------
 function setupGalleryButton() {
   const loadBtn = document.getElementById('load-gallery-button');
   const hideBtn = document.getElementById('hide-gallery-button');
@@ -158,6 +222,10 @@ function setupGalleryButton() {
     });
   }
 }
+
+// -----------------------
+// Window load
+// -----------------------
 window.addEventListener('load', () => {
   initMap();
   wireUI();
@@ -166,6 +234,7 @@ window.addEventListener('load', () => {
   window.addEventListener('offline', updateOnlineStatus);
   updateOnlineStatus();
   setupGalleryButton();
+  hideLoading();
 });
 
 export { loadSavedPhotos };

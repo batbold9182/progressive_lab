@@ -1,15 +1,15 @@
-async function getUserLocation() {
-  return new Promise((resolve) => {
-    if (!navigator.geolocation) {
-      resolve({ latitude: 0, longitude: 0 });
-      return;
-    }
+ function getUserLocation() {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) return reject(new Error("Geolocation not supported"));
+
     navigator.geolocation.getCurrentPosition(
-      (position) => resolve(position.coords),
-      () => resolve({ latitude: 0, longitude: 0 }) 
+      pos => resolve({ latitude: pos.coords.latitude, longitude: pos.coords.longitude }),
+      err => reject(err),  
+      { timeout: 10000 }  
     );
   });
 }
+
 
 function geoFindMe() {
   getUserLocation().then((coords) => {

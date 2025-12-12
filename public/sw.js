@@ -1,4 +1,4 @@
-const CACHE_NAME = 'progressive_lab_v5.6';
+const CACHE_NAME = 'progressive_lab_v6.9.1';
 
 const urlsToCache = [
   '/',

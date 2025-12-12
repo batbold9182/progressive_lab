@@ -12,4 +12,21 @@ function showStatusMessage(message, type = 'info', duration = 5000) {
   }
 }
 
-export { showStatusMessage };
+
+function showLoading(message = 'Loading...') {
+  const loadingOverlay = document.getElementById('loading-overlay'); 
+  if (loadingOverlay) {
+    loadingOverlay.style.display = 'flex';
+    loadingOverlay.textContent = message;
+  }
+}
+
+function hideLoading() {
+const loadingOverlay = document.getElementById('loading-overlay'); 
+  if (loadingOverlay) {
+    loadingOverlay.style.display = 'none';
+    loadingOverlay.textContent = '';
+  }
+}
+
+export { showStatusMessage ,hideLoading,showLoading};

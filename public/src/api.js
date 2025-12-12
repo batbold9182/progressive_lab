@@ -1,3 +1,5 @@
+import { showStatusMessage } from './helper.js';
+
 const BASE = '';
 
 async function fetchPhotos() {
