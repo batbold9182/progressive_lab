@@ -12,6 +12,7 @@ async function fetchPhotos() {
 }
 
 async function uploadPhoto(imageDataUrl, lat, lon) {
+  try{
   const res = await fetch(`${BASE}/upload`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -19,7 +20,11 @@ async function uploadPhoto(imageDataUrl, lat, lon) {
   });
 
   if (!res.ok) throw new Error(`Upload failed: HTTP ${res.status}`);
-  return res.json();
+  return await res.json();
+} catch (error) {
+  showStatusMessage('Failed to upload photo.', 'error');
+  throw error;
+}
 }
 
 async function deletePhoto(filename) {
