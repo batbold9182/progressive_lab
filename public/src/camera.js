@@ -37,20 +37,23 @@ function takePicture() {
     return null;
   }
 }
-
+let currentStream = null;
 function setupCamera() {
-  allowButton.addEventListener('click', () => {
-    navigator.mediaDevices
-      .getUserMedia({ video: true, audio: false })
-      .then((stream) => {
-        video.srcObject = stream;
-        video.play();
-      })
-      .catch((err) => {
-        console.error('Camera error:', err);
-        //alert('Unable to access camera. Check permissions.');
-        showStatusMessage('Unable to access camera. Check permissions.', 'error');
-      });
+  allowButton.addEventListener('click', async () => {
+    try {
+      // Stop previous stream if exists
+      if (currentStream) {
+        currentStream.getTracks().forEach(track => track.stop());
+      }
+
+      // Get new camera stream
+      currentStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+      video.srcObject = currentStream;
+      await video.play();
+    } catch (err) {
+      console.error('Camera error:', err);
+      showStatusMessage('Unable to access camera. Check permissions.', 'error');
+    }
   });
 
   video.addEventListener('canplay', () => {

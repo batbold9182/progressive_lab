@@ -2,14 +2,18 @@ const BASE = '';
 
 async function fetchPhotos() {
   try {
-    const res = await fetch(`${BASE}/photos`);
+    const res = await fetch(`${BASE}/photos`, { cache: 'no-store' });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return await res.json();
-  } catch (error) {
-    showStatusMessage('Failed to load photos.', 'error');
-    throw error;
+    const text = await res.text();
+    if (!text) return [];
+    return JSON.parse(text);
+  } catch (err) {
+    console.error('fetchPhotos error:', err);
+    showStatusMessage(`Failed to load saved photos: ${err.message}`, "error");
+    throw err;
   }
 }
+
 
 async function uploadPhoto(imageDataUrl, lat, lon) {
   try{

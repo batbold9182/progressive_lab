@@ -1,4 +1,5 @@
-const CACHE_NAME = 'progressive_lab_v4.6';
+const CACHE_NAME = 'progressive_lab_v5.6';
+
 const urlsToCache = [
   '/',
   '/index.html',
@@ -11,89 +12,112 @@ const urlsToCache = [
   '/src/camera.js',
   '/src/location.js',
   '/src/offline.js',
+  '/src/helper.js',
   '/manifest.json',
-  '/sw.js',
   '/pictures/logo-192x192.png',
   '/pictures/logo-192x192-maskable.png',
   '/pictures/logo-512x512.png',
   '/pictures/logo-512x512-maskable.png',
   '/pictures/logo.png',
   '/pictures/screenshot-desktop.jpg',
-  '/pictures/screenshot-mobile.jpg',
-  '/src/helper.js'
+  '/pictures/screenshot-mobile.jpg'
 ];
 
-// Install - caching essential files
-self.addEventListener('install', event => {
-  // Activate worker immediately
+// API routes that must NOT be cached or intercepted
+const API_PATHS = [
+  '/photos',
+  '/upload',
+  '/delete'
+];
+
+/* -------------------------------------------------
+   INSTALL
+--------------------------------------------------- */
+self.addEventListener('install', (event) => {
   self.skipWaiting();
 
-  // Try to cache the listed resources. If some resources fail,don't fail the whole install — instead cache what we can.
   event.waitUntil(
-    caches.open(CACHE_NAME).then(async cache => {
+    caches.open(CACHE_NAME).then(async (cache) => {
       try {
-        // cache.addAll will reject if any request fails; try it first for speed
         await cache.addAll(urlsToCache);
       } catch (err) {
-        // Fallback: attempt to fetch & put each resource individually and ignore failures
-        console.warn('Some resources failed to cache with cache.addAll(), falling back to individual caching.', err);
-        await Promise.all(urlsToCache.map(async (url) => {
-          try {
-            const res = await fetch(url);
-            if (res && res.ok) {
-              await cache.put(url, res.clone());
+        console.warn('cache.addAll failed — falling back to manual caching', err);
+
+        await Promise.all(
+          urlsToCache.map(async (url) => {
+            try {
+              const res = await fetch(url);
+              if (res.ok) cache.put(url, res.clone());
+            } catch (e) {
+              console.warn('Failed to cache:', url, e);
             }
-          } catch (e) {
-            // ignore individual failures
-            console.warn('Failed to cache', url, e);
-          }
-        }));
+          })
+        );
       }
     })
   );
 });
 
-// Fetch - cache-first for same-origin, network-only for external resources
-self.addEventListener('fetch', event => {
+/* -------------------------------------------------
+   FETCH
+--------------------------------------------------- */
+self.addEventListener('fetch', (event) => {
   const request = event.request;
+  const url = new URL(request.url);
 
-  // Only handle same-origin GET requests
-  if (request.url.startsWith(self.location.origin) && request.method === 'GET') {
-    event.respondWith(
-      caches.match(request)
-        .then(response => response || fetch(request)
-          .then(fetchResponse => {
-            // Only cache valid same-origin responses
-            if (!fetchResponse || fetchResponse.status !== 200 || fetchResponse.type !== 'basic') {
-              return fetchResponse;
-            }
-            const responseToCache = fetchResponse.clone();
-            caches.open(CACHE_NAME).then(cache => cache.put(request, responseToCache));
-            return fetchResponse;
-          })
-        ).catch(() => {
-          // Optional: fallback for offline documents
+  // ---- 1. BYPASS all API requests ----
+  if (API_PATHS.some((p) => url.pathname.startsWith(p))) {
+    event.respondWith(fetch(request));
+    return;
+  }
+
+  // ---- 2. Only handle same-origin GET requests ----
+  if (request.method !== 'GET' || url.origin !== self.location.origin) {
+    return; // don't touch it
+  }
+
+  event.respondWith(
+    caches.match(request).then((cached) => {
+      if (cached) return cached;
+
+      return fetch(request)
+        .then((networkResponse) => {
+          if (
+            networkResponse &&
+            networkResponse.status === 200 &&
+            networkResponse.type === 'basic'
+          ) {
+            const clone = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+          }
+
+          return networkResponse;
+        })
+        .catch(() => {
           if (request.destination === 'document') {
             return caches.match('/index.html');
           }
-        })
-    );
-  }
-  // External requests go directly to network
+        });
+    })
+  );
 });
 
-
-// Activate - clean up old caches
-self.addEventListener('activate', event => {
-    event.waitUntil(
-        caches.keys().then(cacheNames => {
-            return Promise.all(
-                cacheNames.map(cacheName => {
-                    if (cacheName !== CACHE_NAME) {
-                        return caches.delete(cacheName);
-                    }
-                })
-            );
-        }).then(() => self.clients.claim()) // take control immediately
-    );
+/* -------------------------------------------------
+   ACTIVATE
+--------------------------------------------------- */
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches
+      .keys()
+      .then((names) =>
+        Promise.all(
+          names.map((name) => {
+            if (name !== CACHE_NAME) {
+              return caches.delete(name);
+            }
+          })
+        )
+      )
+      .then(() => self.clients.claim())
+  );
 });
