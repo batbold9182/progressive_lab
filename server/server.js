@@ -1,4 +1,3 @@
-// server/server.js
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
@@ -79,7 +78,7 @@ app.get("/photos", async (req, res) => {
     res.status(500).json({ success: false });
   }
 });
-// server/server.js
+
 app.delete('/delete/:filename', async (req, res) => {
   const { filename } = req.params;
   const filepath = path.join(__dirname, 'uploads', filename);
@@ -89,7 +88,7 @@ app.delete('/delete/:filename', async (req, res) => {
     if (fs.existsSync(filepath)) fs.unlinkSync(filepath);
 
     // Remove from DB
-    await Photo.deleteOne({ imageUrl: `http://localhost:3000/uploads/${filename}` });
+    await Photo.deleteOne({ imageUrl: `http://localhost:${PORT}/uploads/${filename}` });
 
     res.json({ success: true });
   } catch (err) {

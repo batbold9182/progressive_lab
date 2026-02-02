@@ -1,4 +1,4 @@
-const CACHE_NAME = 'progressive_lab_v6.9.1';
+const CACHE_NAME = 'progressive_lab_v7.1.1';
 
 const urlsToCache = [
   '/',
@@ -111,13 +111,14 @@ self.addEventListener('activate', (event) => {
       .keys()
       .then((names) =>
         Promise.all(
-          names.map((name) => {
-            if (name !== CACHE_NAME) {
-              return caches.delete(name);
-            }
-          })
+          names
+            .filter((name) => name !== CACHE_NAME)
+            .map((name) => caches.delete(name))
         )
       )
       .then(() => self.clients.claim())
+      .catch((err) => {
+        console.error('Service Worker activation failed:', err);
+      })
   );
 });

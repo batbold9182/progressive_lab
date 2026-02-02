@@ -10,20 +10,20 @@
   "background_color": "#ffffff",
   "theme_color": "#0a84ff",
   "icons": [
-    { "src": "/pictures/logo-192x192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "/pictures/logo-192x192-maskable.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
-    { "src": "/pictures/logo-512x512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "/pictures/logo-512x512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    { "src": "./pictures/logo-192x192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "./pictures/logo-192x192-maskable.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "./pictures/logo-512x512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "./pictures/logo-512x512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ],
   "screenshots": [
   {
-    "src": "/pictures/screenshot-desktop.jpg",
+    "src": "./pictures/screenshot-desktop.jpg",
     "sizes": "1280x720",
     "type": "image/jpg",
     "form_factor": "wide"
   },
   {
-    "src": "/pictures/screenshot-mobile.jpg",
+    "src": "./pictures/screenshot-mobile.jpg",
     "sizes": "640x1136",
     "type": "image/jpg",
     "form_factor": "narrow"

@@ -61,9 +61,8 @@ function setupCamera() {
     if (video.videoWidth > 0 && video.videoHeight > 0) {
       height = video.videoHeight / (video.videoWidth / width);
     } else {
-      // Fallback if metadata is not ready
-      height = width * 0.75; // 4:3 alternative
-      // height = width * 9 / 16; // If you prefer 16:9
+      //height = width * 0.75; 
+      height = width * 9 / 16;
     }
 
     video.setAttribute('width', width);
